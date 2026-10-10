@@ -1,7 +1,7 @@
 """
 BUSINESS ENGLISH PRO PODCAST - 16:9 FULL HD (1920x1080) VIDEO GENERATOR
-Format: 1920x1080 Landscape Studio Broadcast
-Dual Hosts (Emma & Andrew) breaking down corporate communication, email formulas, boardroom diplomacy, and career confidence.
+Theme: Executive Penthouse Studio & Wall Street Broadcast Booth
+Visuals: Illuminated "ON AIR" Lightbox + Brass Executive Mics + 24-Channel dB Peak Meter + Single-Line Highlighted Subtitles
 """
 import os, sys, json, math, subprocess, random, requests, re, asyncio
 from pathlib import Path
@@ -23,15 +23,17 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 VIDEO_WIDTH = 1920
 VIDEO_HEIGHT = 1080
-FPS = 30
+SUBFRAMES_PER_SEC = 2
 
-YELLOW = (255, 215, 0)
+EXECUTIVE_GOLD = (245, 158, 11)
+PLATINUM = (226, 232, 240)
+NAVY_ACCENT = (30, 58, 138)
+ON_AIR_RED = (239, 68, 68)
 WHITE = (255, 255, 255)
-MUTED_WHITE = (220, 225, 235)
-DARK_BG = (12, 18, 32)
-DARK_BAR = (20, 30, 52)
-GOLD_ACCENT = (245, 158, 11)
-CHANNEL_NAME = "BUSINESS ENGLISH PRO"
+DARK_BG = (10, 16, 32)
+CARD_BG = (18, 28, 52)
+CARD_BORDER = (45, 68, 110)
+MUTED_TEXT = (160, 178, 205)
 
 EMMA_VOICE = "en-US-AvaNeural"
 ANDREW_VOICE = "en-US-AndrewNeural"
@@ -63,12 +65,10 @@ TOPICS = [
 
 def load_font(size, bold=True):
     fonts_to_try = [
-        "C:/Windows/Fonts/arialbd.ttf",
-        "C:/Windows/Fonts/arial.ttf",
-        "C:/Windows/Fonts/segoeuib.ttf",
-        "C:/Windows/Fonts/trebucbd.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "C:/Windows/Fonts/arialbd.ttf" if bold else "C:/Windows/Fonts/arial.ttf",
+        "C:/Windows/Fonts/segoeuib.ttf" if bold else "C:/Windows/Fonts/segoeui.ttf",
+        "C:/Windows/Fonts/trebucbd.ttf" if bold else "C:/Windows/Fonts/trebuc.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
     ]
     for p in fonts_to_try:
         if Path(p).exists():
@@ -155,127 +155,210 @@ async def generate_audio_files(turns, run_dir):
         audio_list.append({"path": str(mp3_p), "duration": duration, "speaker": turn["speaker"]})
     return audio_list
 
-def draw_equalizer_waves(draw, start_x, start_y, frame_idx=0):
-    num_bars = 8
-    bar_w = 5
-    gap = 6
-    for i in range(num_bars):
-        h = int(16 + 14 * abs(math.sin(frame_idx * 0.5 + i * 1.2)))
-        x = start_x + i * (bar_w + gap)
-        y_top = start_y - h // 2
-        y_bot = start_y + h // 2
-        draw.rounded_rectangle([(x, y_top), (x + bar_w, y_bot)], radius=2, fill=YELLOW)
+def draw_executive_mic(draw, center_x, center_y, is_active, host_label):
+    # Polished heavy brass/black base
+    ring_c = EXECUTIVE_GOLD if is_active else (60, 75, 105)
+    draw.ellipse([(center_x - 65, center_y + 115), (center_x + 65, center_y + 135)], fill=(18, 26, 42), outline=ring_c, width=3)
+    # Brass stem
+    draw.rectangle([(center_x - 7, center_y - 10), (center_x + 7, center_y + 115)], fill=(90, 80, 50) if is_active else (50, 60, 85))
 
-def render_podcast_frame(topic_item, turn, idx, total_turns, elapsed, total_dur, out_path):
-    woman_path = ASSETS_DIR / "woman_base.png"
-    if woman_path.exists():
-        canvas = Image.open(woman_path).convert("RGBA").resize((VIDEO_WIDTH, VIDEO_HEIGHT), Image.Resampling.LANCZOS)
-    else:
-        canvas = Image.new("RGBA", (VIDEO_WIDTH, VIDEO_HEIGHT), DARK_BG)
-        gdraw = ImageDraw.Draw(canvas)
-        for y in range(VIDEO_HEIGHT):
-            shade = int(12 + (y / VIDEO_HEIGHT) * 22)
-            gdraw.line([(0, y), (VIDEO_WIDTH, y)], fill=(shade, shade + 6, shade + 20, 255))
+    # Mic Body
+    mic_c = (22, 34, 55) if not is_active else (38, 54, 88)
+    draw.rounded_rectangle([(center_x - 30, center_y - 95), (center_x + 30, center_y - 20)], radius=16, fill=mic_c, outline=EXECUTIVE_GOLD if is_active else CARD_BORDER, width=3)
 
+    # Brass bands
+    draw.rectangle([(center_x - 30, center_y - 65), (center_x + 30, center_y - 58)], fill=EXECUTIVE_GOLD)
+    for gy in range(center_y - 85, center_y - 30, 10):
+        draw.line([(center_x - 22, gy), (center_x + 22, gy)], fill=EXECUTIVE_GOLD if is_active else (55, 70, 95), width=2)
+
+    # Host Label
+    f_p = load_font(22, bold=True)
+    box_c = (20, 32, 54) if not is_active else (45, 36, 18)
+    draw.rounded_rectangle([(center_x - 85, center_y + 145), (center_x + 85, center_y + 180)], radius=8, fill=box_c, outline=EXECUTIVE_GOLD, width=2)
+    tag = f"🎙️ {host_label}" + (" (SPEAKER)" if is_active else "")
+    draw.text((center_x, center_y + 162), tag, fill=EXECUTIVE_GOLD if is_active else MUTED_TEXT, font=f_p, anchor="mm")
+
+def draw_on_air_box(draw, center_x, center_y, is_live):
+    # Illuminated ON AIR Acrylic Lightbox
+    box_w = 260
+    box_h = 58
+    bg_c = (180, 20, 20) if is_live else (45, 15, 18)
+    border_c = (255, 80, 80) if is_live else (90, 30, 35)
+
+    draw.rounded_rectangle([(center_x - box_w//2, center_y - box_h//2),
+                            (center_x + box_w//2, center_y + box_h//2)],
+                           radius=10, fill=bg_c, outline=border_c, width=3)
+
+    f_onair = load_font(30, bold=True)
+    txt_c = WHITE if is_live else (180, 120, 125)
+    draw.text((center_x, center_y), "🔴 ON AIR", fill=txt_c, font=f_onair, anchor="mm")
+
+def draw_peak_program_meter(draw, center_x, center_y, width, height, sub_idx, is_speaking):
+    num_bars = 24
+    bar_w = 9
+    gap = (width - (num_bars * bar_w)) // (num_bars - 1)
+
+    draw.rounded_rectangle([(center_x - width//2 - 18, center_y - height//2 - 12),
+                            (center_x + width//2 + 18, center_y + height//2 + 12)],
+                           radius=16, fill=(12, 18, 36), outline=EXECUTIVE_GOLD, width=2)
+
+    f_hud = load_font(18, bold=True)
+    draw.text((center_x, center_y - height//2 - 1), "• STUDIO BROADCAST PEAK PROGRAM METER (dB) •", fill=PLATINUM, font=f_hud, anchor="mm")
+
+    start_x = center_x - width//2
+    for b in range(num_bars):
+        if is_speaking:
+            phase = sub_idx * 0.92 + b * 0.45
+            wave = abs(math.sin(phase)) * 0.75 + abs(math.cos(phase * 1.35)) * 0.25
+            bar_h = int(12 + wave * (height - 28))
+        else:
+            bar_h = 8
+
+        bx = start_x + b * (bar_w + gap)
+        by = center_y + height//2 - 8 - bar_h
+
+        # Multi-color PPM ladder: Green below 60%, Yellow 60-85%, Red peak > 85%
+        ratio = bar_h / float(height - 28)
+        if ratio > 0.85:
+            fill_c = ON_AIR_RED
+        elif ratio > 0.55:
+            fill_c = EXECUTIVE_GOLD
+        else:
+            fill_c = (34, 197, 94) # Broadcast Green
+
+        draw.rounded_rectangle([(bx, by), (bx + bar_w, center_y + height//2 - 8)], radius=3, fill=fill_c)
+
+def render_podcast_subframe(topic_item, turn, turn_idx, sub_idx, total_subframes, elapsed, total_dur, out_path):
+    canvas = Image.new("RGBA", (VIDEO_WIDTH, VIDEO_HEIGHT), DARK_BG)
     draw = ImageDraw.Draw(canvas)
 
-    # 1. Top Left Channel Badge
-    font_tab = load_font(30, bold=True)
-    draw.rounded_rectangle([(60, 40), (610, 110)], radius=18, fill=DARK_BAR, outline=YELLOW, width=3)
-    draw_equalizer_waves(draw, 90, 75, frame_idx=idx)
-    draw.text((190, 75), CHANNEL_NAME, fill=WHITE, font=font_tab, anchor="lm")
+    # Executive Penthouse Studio Backdrop
+    for y in range(VIDEO_HEIGHT):
+        ratio = y / VIDEO_HEIGHT
+        r = int(10 + ratio * 14)
+        g = int(16 + ratio * 18)
+        b = int(32 + ratio * 28)
+        draw.line([(0, y), (VIDEO_WIDTH, y)], fill=(r, g, b, 255))
 
-    # 2. Top Center Topic Pill
-    draw.rounded_rectangle([(650, 40), (1480, 110)], radius=18, fill=(24, 36, 64), outline=GOLD_ACCENT, width=2)
-    f_topic = load_font(26, bold=True)
-    draw.text((1065, 75), f"💼 TOPIC: {topic_item['category']}", fill=GOLD_ACCENT, font=f_topic, anchor="mm")
+    # City skyscraper bokeh / window grid in background
+    for wx in range(160, VIDEO_WIDTH, 200):
+        draw.line([(wx, 120), (wx, 620)], fill=(22, 32, 54), width=1)
+    for wy in range(160, 620, 90):
+        draw.line([(100, wy), (1820, wy)], fill=(22, 32, 54), width=1)
 
-    # 3. Top Right Speaker Badge
-    speaker_name = "EMMA" if turn["speaker"] == "Host1" else "ANDREW"
-    font_spk = load_font(28, bold=True)
-    draw.rounded_rectangle([(1520, 40), (1860, 110)], radius=18, fill=DARK_BAR, outline=YELLOW, width=3)
-    draw.text((1690, 75), f"🎙️ HOST: {speaker_name}", fill=YELLOW, font=font_spk, anchor="mm")
+    # Top Header Deck
+    # Left: Channel badge
+    draw.rounded_rectangle([(60, 36), (560, 106)], radius=16, fill=CARD_BG, outline=EXECUTIVE_GOLD, width=2)
+    f_brand = load_font(28, bold=True)
+    draw.text((310, 71), "💼 BUSINESS ENGLISH PRO", fill=PLATINUM, font=f_brand, anchor="mm")
 
-    # 4. Center Podcast Dialogue Text Display
-    text = turn["text"]
-    parts = re.split(r'(\*\*.*?\*\*)', text)
-    words_list = []
-    for p in parts:
-        if p.startswith('**') and p.endswith('**'):
-            words_list.append((p[2:-2], True))
-        elif p:
-            for w in p.split(' '):
-                if w: words_list.append((w, False))
+    # Center: Category Pill
+    draw.rounded_rectangle([(590, 36), (1450, 106)], radius=16, fill=(18, 30, 56), outline=PLATINUM, width=2)
+    f_scen = load_font(26, bold=True)
+    draw.text((1020, 71), f"🏛️ FOCUS: {topic_item['category']}", fill=EXECUTIVE_GOLD, font=f_scen, anchor="mm")
 
-    text_left = 780
-    text_right = 1820
-    max_w = text_right - text_left
-    center_x = (text_left + text_right) // 2
+    # Right: Penthouse Studio Tag
+    draw.rounded_rectangle([(1480, 36), (1860, 106)], radius=16, fill=(24, 34, 60), outline=EXECUTIVE_GOLD, width=2)
+    f_air = load_font(26, bold=True)
+    draw.text((1670, 71), "EXECUTIVE DESK", fill=PLATINUM, font=f_air, anchor="mm")
 
-    font_size = 85
-    lines = None
-    while font_size >= 45:
-        curr_font = load_font(font_size, bold=True)
-        curr_lines = []
-        curr_line = []
-        curr_w = 0
-        for word, is_y in words_list:
-            wb = draw.textbbox((0, 0), word, font=curr_font)
-            wl = wb[2] - wb[0] + 12
-            if curr_w + wl > max_w and curr_line:
-                curr_lines.append((curr_line, curr_w))
-                curr_line = [(word, is_y, wl)]
-                curr_w = wl
+    # Visual Studio Centerpiece: ON AIR Lightbox + Dual Brass Mics + Peak PPM Meter
+    is_emma = (turn["speaker"] == "Host1")
+    is_andrew = not is_emma
+
+    # Center Top: Illuminated "ON AIR" Lightbox
+    draw_on_air_box(draw, center_x=960, center_y=190, is_live=True)
+
+    # Left Mic: Emma
+    draw_executive_mic(draw, center_x=320, center_y=380, is_active=is_emma, host_label="EMMA")
+
+    # Center Equalizer: Peak Program dB Meter
+    draw_peak_program_meter(draw, center_x=960, center_y=350, width=560, height=140, sub_idx=sub_idx, is_speaking=True)
+
+    # Center Executive Formula Pill
+    draw.rounded_rectangle([(600, 460), (1320, 540)], radius=14, fill=CARD_BG, outline=CARD_BORDER, width=2)
+    f_top = load_font(22, bold=True)
+    draw.text((960, 500), f"Executive Formula: \"{topic_item['phrase']}\"", fill=EXECUTIVE_GOLD, font=f_top, anchor="mm")
+
+    # Right Mic: Andrew
+    draw_executive_mic(draw, center_x=1600, center_y=380, is_active=is_andrew, host_label="ANDREW")
+
+    # LOWER THIRD: SLEEK SINGLE-LINE SUBTITLE DISPLAY WITH WORD-BY-WORD HIGHLIGHTING
+    draw.rounded_rectangle([(100, 680), (1820, 930)], radius=24, fill=(14, 22, 44, 240), outline=EXECUTIVE_GOLD, width=3)
+
+    # Speaker Tag Pill
+    active_name = "EMMA (Host)" if is_emma else "ANDREW (Host)"
+    draw.rounded_rectangle([(140, 650), (450, 705)], radius=12, fill=EXECUTIVE_GOLD)
+    f_spk = load_font(26, bold=True)
+    draw.text((295, 677), f"🎙️ {active_name}", fill=(10, 16, 28), font=f_spk, anchor="mm")
+
+    # Sentence & Spoken Word Highlighting
+    raw_text = turn["text"]
+    words_clean = [re.sub(r'[\*\*\.]', '', w).strip() for w in raw_text.split() if w.strip()]
+    if not words_clean:
+        words_clean = ["Listen", "carefully"]
+
+    active_word_idx = min(len(words_clean) - 1, int((sub_idx / max(1, total_subframes)) * len(words_clean)))
+
+    f_sub = load_font(42, bold=True)
+    rendered_words = raw_text.split()
+
+    line_words = []
+    lines = []
+    max_w = 1600
+    curr_w = 0
+
+    for w_i, w in enumerate(rendered_words):
+        clean_w = re.sub(r'\*\*(.*?)\*\*', r'\1', w)
+        wb = draw.textbbox((0, 0), clean_w + " ", font=f_sub)
+        w_len = wb[2] - wb[0]
+        if curr_w + w_len > max_w and line_words:
+            lines.append(line_words)
+            line_words = [(w_i, w, clean_w, w_len)]
+            curr_w = w_len
+        else:
+            line_words.append((w_i, w, clean_w, w_len))
+            curr_w += w_len
+    if line_words:
+        lines.append(line_words)
+
+    y_start = 740 if len(lines) == 1 else 725
+    line_h = 55
+    for l_idx, line in enumerate(lines[:2]):
+        total_line_w = sum(item[3] for item in line)
+        start_x = 960 - total_line_w // 2
+        curr_x = start_x
+        y_pos = y_start + l_idx * line_h
+
+        for (w_i, raw_w, clean_w, w_len) in line:
+            is_active_word = (w_i == active_word_idx)
+            is_key_word = ("**" in raw_w)
+
+            if is_active_word:
+                # Gold active karaoke pill
+                draw.rounded_rectangle([(curr_x - 4, y_pos - 6), (curr_x + w_len - 2, y_pos + 46)], radius=8, fill=EXECUTIVE_GOLD)
+                draw.text((curr_x, y_pos), clean_w, fill=(10, 16, 28), font=f_sub)
+            elif is_key_word:
+                draw.text((curr_x, y_pos), clean_w, fill=PLATINUM, font=f_sub)
             else:
-                curr_line.append((word, is_y, wl))
-                curr_w += wl
-        if curr_line:
-            curr_lines.append((curr_line, curr_w))
-        if len(curr_lines) <= 3 and all(w <= max_w for _, w in curr_lines):
-            lines = curr_lines
-            main_font = curr_font
-            break
-        font_size -= 5
+                draw.text((curr_x, y_pos), clean_w, fill=WHITE, font=f_sub)
+            curr_x += w_len
 
-    if lines is None:
-        main_font = load_font(45, bold=True)
-        lines = curr_lines
+    # Tip Ribbon inside the Lower Third
+    f_tip = load_font(22, bold=False)
+    draw.text((960, 885), "💡 Corporate Formula: Using polite modals ('could', 'would') creates instant executive diplomacy.", fill=MUTED_TEXT, font=f_tip, anchor="mm")
 
-    line_h = int(font_size * 1.35)
-    total_h = len(lines) * line_h
-    start_y = 520 - total_h // 2
-
-    shadow_img = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
-    sdraw = ImageDraw.Draw(shadow_img)
-    for l_idx, (line_words, line_w) in enumerate(lines):
-        cx = center_x - line_w // 2
-        cy = start_y + l_idx * line_h
-        for word, _, wl in line_words:
-            sdraw.text((cx + 4, cy + 4), word, fill=(0, 0, 0, 230), font=main_font)
-            cx += wl
-    shadow_img = shadow_img.filter(ImageFilter.GaussianBlur(5))
-    canvas.paste(shadow_img, (0, 0), shadow_img)
-
-    draw = ImageDraw.Draw(canvas)
-    for l_idx, (line_words, line_w) in enumerate(lines):
-        cx = center_x - line_w // 2
-        cy = start_y + l_idx * line_h
-        for word, is_y, wl in line_words:
-            color = YELLOW if is_y else WHITE
-            draw.text((cx, cy), word, fill=color, font=main_font)
-            cx += wl
-
-    # 5. Bottom Progress Bar & Branding
-    draw.line([(0, 1020), (VIDEO_WIDTH, 1020)], fill=(35, 45, 65), width=3)
+    # Bottom Progress Deck
+    draw.line([(0, 1020), (VIDEO_WIDTH, 1020)], fill=(32, 45, 75), width=3)
     ratio = min(1.0, elapsed / max(1.0, total_dur))
-    draw.line([(0, 1020), (int(VIDEO_WIDTH * ratio), 1020)], fill=YELLOW, width=6)
+    draw.line([(0, 1020), (int(VIDEO_WIDTH * ratio), 1020)], fill=EXECUTIVE_GOLD, width=6)
 
-    font_sub = load_font(26, bold=False)
-    draw.text((70, 1050), "Business English Pro • Executive Communication • Career Fluency", fill=MUTED_WHITE, font=font_sub, anchor="lm")
+    f_bot = load_font(24, bold=False)
+    draw.text((70, 1050), "Business English Pro • Executive Communication • Corporate Fluency", fill=MUTED_TEXT, font=f_bot, anchor="lm")
     time_str = f"{int(elapsed // 60):02d}:{int(elapsed % 60):02d} / {int(total_dur // 60):02d}:{int(total_dur % 60):02d}"
-    draw.text((1850, 1050), time_str, fill=YELLOW, font=font_sub, anchor="rm")
+    draw.text((1850, 1050), time_str, fill=EXECUTIVE_GOLD, font=f_bot, anchor="rm")
 
-    canvas.convert("RGB").save(out_path, quality=92)
+    canvas.convert("RGB").save(out_path, quality=90)
 
 def assemble_video(topic_item, turns, audio_list, run_dir):
     frames_dir = run_dir / "frames"
@@ -288,21 +371,40 @@ def assemble_video(topic_item, turns, audio_list, run_dir):
     clips = []
 
     for i, (turn, audio) in enumerate(zip(turns, audio_list)):
-        img_p = frames_dir / f"frame_{i:03d}.png"
+        dur = audio["duration"]
+        subframes_count = max(8, int(dur * SUBFRAMES_PER_SEC))
+
+        turn_frames_dir = frames_dir / f"turn_{i:03d}"
+        turn_frames_dir.mkdir(parents=True, exist_ok=True)
+
+        for s_idx in range(subframes_count):
+            frame_p = turn_frames_dir / f"frame_{s_idx:04d}.png"
+            sub_elapsed = elapsed + (s_idx / subframes_count) * dur
+            render_podcast_subframe(
+                topic_item, turn, i, s_idx, subframes_count,
+                sub_elapsed, total_dur, str(frame_p)
+            )
+
         clip_p = clips_dir / f"clip_{i:03d}.mp4"
+        input_pattern = str(turn_frames_dir / "frame_%04d.png")
 
-        render_podcast_frame(topic_item, turn, i, len(turns), elapsed, total_dur, str(img_p))
-
-        dur_str = f"{audio['duration']:.3f}"
-        subprocess.run([
-            "ffmpeg", "-y", "-loop", "1", "-i", str(img_p), "-i", audio["path"],
-            "-vf", f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},fps={FPS}",
-            "-c:v", "libx264", "-c:a", "aac", "-b:a", "192k",
-            "-pix_fmt", "yuv420p", "-preset", "fast", "-t", dur_str, str(clip_p)
-        ], check=True, capture_output=True)
+        cmd = [
+            "ffmpeg", "-y",
+            "-framerate", str(SUBFRAMES_PER_SEC),
+            "-i", input_pattern,
+            "-i", audio["path"],
+            "-c:v", "libx264",
+            "-pix_fmt", "yuv420p",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-shortest",
+            "-preset", "veryfast",
+            str(clip_p)
+        ]
+        subprocess.run(cmd, check=True, capture_output=True)
 
         clips.append(clip_p)
-        elapsed += audio["duration"]
+        elapsed += dur
 
     concat_txt = run_dir / "concat.txt"
     with open(concat_txt, "w") as f:
@@ -319,15 +421,15 @@ async def run_business_generation(topic_idx=0, turns_count=4):
     run_dir = OUTPUT_DIR / f"run_{ts}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"[Business Podcast] Generating 16:9 Podcast: '{topic_item['topic']}' ({turns_count} turns)...")
+    print(f"[Business Podcast] Generating 16:9 Executive Penthouse: '{topic_item['topic']}' ({turns_count} turns)...")
     turns = generate_script_ai(topic_item, target_turns=turns_count)
     audio_list = await generate_audio_files(turns, run_dir)
     video_p, dur = assemble_video(topic_item, turns, audio_list, run_dir)
 
     meta = {
-        "title": f"Business English: {topic_item['topic']} 🎙️ Slow Career Podcast",
-        "description": f"Upgrade your workplace English communication! Learn how to use '{topic_item['phrase']}' naturally in emails and meetings with Emma & Andrew. 💼📊",
-        "category": topic_item["category"],
+        "title": f"Business English Pro: {topic_item['topic']} 🎙️ Slow English Podcast",
+        "description": f"Level up your corporate English! Master executive communication: '{topic_item['phrase']}'. Follow for daily workplace English lessons! 💼📊",
+        "phrase": topic_item["phrase"],
         "duration_seconds": dur
     }
     with open(run_dir / "metadata.json", "w", encoding="utf-8") as f:
@@ -335,3 +437,6 @@ async def run_business_generation(topic_idx=0, turns_count=4):
 
     print(f"[Business Podcast] Video ready: {video_p}")
     return video_p, meta
+
+if __name__ == "__main__":
+    asyncio.run(run_business_generation(topic_idx=0, turns_count=2))
