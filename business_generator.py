@@ -1,12 +1,17 @@
 """
-BUSINESS ENGLISH PRO PODCAST - 16:9 FULL HD (1920x1080) VIDEO GENERATOR
-Theme: Executive Penthouse Studio & Wall Street Broadcast Booth
-Visuals: Illuminated "ON AIR" Lightbox + Brass Executive Mics + 24-Channel dB Peak Meter + Single-Line Highlighted Subtitles
+BUSINESS ENGLISH PRO PODCAST - 16:9 FULL HD (1920x1080)
+Format: 1920x1080 Landscape Studio Broadcast (Directly inspired by velocitykorean/fl-eng-std)
+Features:
+- Studio Host Setting on the left with Executive Navy/Slate broadcast grading
+- Minimalist, elegant top pills (NO clutter, NO extra boxes)
+- HUGE high-contrast subtitle typography with word-by-word karaoke highlighting
+- REALISTIC audio equalizer at the bottom reacting directly to actual voice frequencies
+- Real-time elapsed timeline progress bar
 """
 import os, sys, json, math, subprocess, random, requests, re, asyncio
 from pathlib import Path
 from datetime import datetime
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from dotenv import load_dotenv
 import edge_tts
 
@@ -23,21 +28,22 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 VIDEO_WIDTH = 1920
 VIDEO_HEIGHT = 1080
-SUBFRAMES_PER_SEC = 2
+FPS = 30
 
-EXECUTIVE_GOLD = (245, 158, 11)
-PLATINUM = (226, 232, 240)
-NAVY_ACCENT = (30, 58, 138)
-ON_AIR_RED = (239, 68, 68)
+# Colors
+EXECUTIVE_GOLD = (245, 158, 11)      # Executive Champagne Gold (#F59E0B)
 WHITE = (255, 255, 255)
-DARK_BG = (10, 16, 32)
-CARD_BG = (18, 28, 52)
-CARD_BORDER = (45, 68, 110)
-MUTED_TEXT = (160, 178, 205)
+MUTED_WHITE = (220, 225, 235)
+DARK_BAR = (16, 22, 38)
+EQ_BG = (12, 16, 30, 220)
+EQ_BORDER = (45, 60, 95)
+
+CHANNEL_NAME = "BUSINESS ENGLISH PRO"
+EQ_COLORS_FFMPEG = "0xF59E0B|0x3B82F6"
 
 EMMA_VOICE = "en-US-AvaNeural"
 ANDREW_VOICE = "en-US-AndrewNeural"
-VOICE_RATE = "-15%"
+VOICE_RATE = "-14%"
 
 TOPICS = [
     {
@@ -45,21 +51,39 @@ TOPICS = [
         "category": "EMAIL DIPLOMACY & DEADLINES",
         "phrase": "COULD YOU PLEASE PRIORITIZE THIS BY EOD?",
         "keyword": "PRIORITIZE",
-        "sub": "SOUND PROFESSIONAL NOT AGGRESSIVE"
+        "sub": "SOUND PROFESSIONAL NOT AGGRESSIVE",
+        "turns": [
+            {"speaker": "Host1", "text": "Welcome back everyone. Today we are discussing how to sound like a senior executive in your **workplace** emails."},
+            {"speaker": "Host2", "text": "Never write I need this right now. Instead, say: Could you please **prioritize** this by end of day?"},
+            {"speaker": "Host1", "text": "Using polite modal verbs like could or would keeps your communication professional and **diplomatic**."},
+            {"speaker": "Host2", "text": "It ensures high respect from your colleagues and builds long term career **credibility**."}
+        ]
     },
     {
         "topic": "Diplomatic Disagreements: How to Disagree Respectfully in Meetings",
         "category": "MEETING COMMUNICATION",
         "phrase": "I SEE YOUR PERSPECTIVE BUT HAVE A SLIGHTLY DIFFERENT TAKE",
         "keyword": "PERSPECTIVE",
-        "sub": "CONSTRUCTIVE WORKPLACE DIALOGUE"
+        "sub": "CONSTRUCTIVE WORKPLACE DIALOGUE",
+        "turns": [
+            {"speaker": "Host1", "text": "In executive meetings, disagreeing aggressively can damage valuable working **relationships**."},
+            {"speaker": "Host2", "text": "A great formula is: I see your perspective, but I have a slightly different **take** on this."},
+            {"speaker": "Host1", "text": "Acknowledging their point first makes people open to your alternative **strategy**."},
+            {"speaker": "Host2", "text": "It frames the discussion as collaborative problem solving rather than a personal **conflict**."}
+        ]
     },
     {
         "topic": "Salary Negotiation and Career Advancement Phrasing",
         "category": "CAREER ADVANCEMENT",
         "phrase": "BASED ON MY RECENT DELIVERABLES AND MARKET STANDARDS",
         "keyword": "DELIVERABLES",
-        "sub": "CONFIDENT VALUE-DRIVEN CONVERSATIONS"
+        "sub": "CONFIDENT VALUE-DRIVEN CONVERSATIONS",
+        "turns": [
+            {"speaker": "Host1", "text": "When discussing compensation, base your conversation entirely on measurable **deliverables**."},
+            {"speaker": "Host2", "text": "State clearly: Based on my recent deliverables, I would like to review my compensation **structure**."},
+            {"speaker": "Host1", "text": "Always focus on value provided to the company rather than personal financial **needs**."},
+            {"speaker": "Host2", "text": "This positions you as an indispensable business partner who drives measurable **results**."}
+        ]
     }
 ]
 
@@ -81,7 +105,7 @@ def clean_text(text):
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
-def generate_script_ai(topic_item, target_turns=6):
+def generate_script_ai(topic_item, target_turns=4):
     prompt = f"""Write {target_turns} turns of a slow, clear English podcast between Emma and Andrew.
 Topic: {topic_item['topic']}
 Category: {topic_item['category']}
@@ -90,7 +114,7 @@ Key Executive Phrasing: {topic_item['phrase']}
 RULES:
 - Dialogue alternating between Host1 (Emma) and Host2 (Andrew)
 - Each turn MUST be 2-3 short, clear sentences (18-28 words)
-- Focus on practical workplace formulas: replacing blunt demands with polite, diplomatic corporate language
+- Focus on practical workplace formulas: replacing blunt demands with polite corporate language
 - Wrap exactly 1 key learning word per turn in **asterisks**
 - Return as clean JSON array only:
 [{{"speaker":"Host1","text":"..."}},{{"speaker":"Host2","text":"..."}}]"""
@@ -105,7 +129,7 @@ RULES:
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.8
-            }, headers={"Authorization": f"Bearer {key}"}, timeout=60)
+            }, headers={"Authorization": f"Bearer {key}"}, timeout=20)
             if resp.status_code == 200:
                 raw = resp.json()["choices"][0]["message"]["content"].strip()
                 if "```json" in raw: raw = raw.split("```json")[1].split("```")[0].strip()
@@ -125,12 +149,12 @@ RULES:
         except Exception as e:
             print(f"[script] AI note: {e}, using curated fallback.")
 
-    return [
-        {"speaker": "Host1", "text": f"Welcome back everyone! Today we are discussing how to sound like a senior executive in your **workplace** emails."},
-        {"speaker": "Host2", "text": f"Never write 'I need this right now'. Instead, say: Could you please **prioritize** this by end of day?"},
-        {"speaker": "Host1", "text": f"Using polite modal verbs like could or would keeps your communication professional and **diplomatic**."},
-        {"speaker": "Host2", "text": f"It ensures high respect from your colleagues and builds long term **career** credibility!"}
-    ][:target_turns]
+    return topic_item.get("turns", [
+        {"speaker": "Host1", "text": "Welcome back everyone. Today we are discussing how to sound like a senior executive in your **workplace** emails."},
+        {"speaker": "Host2", "text": "Never write I need this right now. Instead, say: Could you please **prioritize** this by end of day?"},
+        {"speaker": "Host1", "text": "Using polite modal verbs like could or would keeps your communication professional and **diplomatic**."},
+        {"speaker": "Host2", "text": "It ensures high respect from your colleagues and builds long term career **credibility**."}
+    ])[:target_turns]
 
 async def generate_audio_files(turns, run_dir):
     audio_dir = run_dir / "audio"
@@ -155,210 +179,121 @@ async def generate_audio_files(turns, run_dir):
         audio_list.append({"path": str(mp3_p), "duration": duration, "speaker": turn["speaker"]})
     return audio_list
 
-def draw_executive_mic(draw, center_x, center_y, is_active, host_label):
-    # Polished heavy brass/black base
-    ring_c = EXECUTIVE_GOLD if is_active else (60, 75, 105)
-    draw.ellipse([(center_x - 65, center_y + 115), (center_x + 65, center_y + 135)], fill=(18, 26, 42), outline=ring_c, width=3)
-    # Brass stem
-    draw.rectangle([(center_x - 7, center_y - 10), (center_x + 7, center_y + 115)], fill=(90, 80, 50) if is_active else (50, 60, 85))
+def load_base_studio_canvas():
+    woman_path = ASSETS_DIR / "woman_base.png"
+    if woman_path.exists():
+        img = Image.open(woman_path).convert("RGB")
+        # Executive Navy / Slate studio grading
+        r, g, b = img.split()
+        b = b.point(lambda i: min(255, int(i * 1.10)))
+        g = g.point(lambda i: min(255, int(i * 1.02)))
+        r = r.point(lambda i: int(i * 0.95))
+        graded = Image.merge("RGB", (r, g, b))
+        graded = ImageEnhance.Contrast(graded).enhance(1.08)
+        return graded.convert("RGBA").resize((VIDEO_WIDTH, VIDEO_HEIGHT), Image.Resampling.LANCZOS)
+    else:
+        canvas = Image.new("RGBA", (VIDEO_WIDTH, VIDEO_HEIGHT), (10, 16, 32, 255))
+        return canvas
 
-    # Mic Body
-    mic_c = (22, 34, 55) if not is_active else (38, 54, 88)
-    draw.rounded_rectangle([(center_x - 30, center_y - 95), (center_x + 30, center_y - 20)], radius=16, fill=mic_c, outline=EXECUTIVE_GOLD if is_active else CARD_BORDER, width=3)
-
-    # Brass bands
-    draw.rectangle([(center_x - 30, center_y - 65), (center_x + 30, center_y - 58)], fill=EXECUTIVE_GOLD)
-    for gy in range(center_y - 85, center_y - 30, 10):
-        draw.line([(center_x - 22, gy), (center_x + 22, gy)], fill=EXECUTIVE_GOLD if is_active else (55, 70, 95), width=2)
-
-    # Host Label
-    f_p = load_font(22, bold=True)
-    box_c = (20, 32, 54) if not is_active else (45, 36, 18)
-    draw.rounded_rectangle([(center_x - 85, center_y + 145), (center_x + 85, center_y + 180)], radius=8, fill=box_c, outline=EXECUTIVE_GOLD, width=2)
-    tag = f"🎙️ {host_label}" + (" (SPEAKER)" if is_active else "")
-    draw.text((center_x, center_y + 162), tag, fill=EXECUTIVE_GOLD if is_active else MUTED_TEXT, font=f_p, anchor="mm")
-
-def draw_on_air_box(draw, center_x, center_y, is_live):
-    # Illuminated ON AIR Acrylic Lightbox
-    box_w = 260
-    box_h = 58
-    bg_c = (180, 20, 20) if is_live else (45, 15, 18)
-    border_c = (255, 80, 80) if is_live else (90, 30, 35)
-
-    draw.rounded_rectangle([(center_x - box_w//2, center_y - box_h//2),
-                            (center_x + box_w//2, center_y + box_h//2)],
-                           radius=10, fill=bg_c, outline=border_c, width=3)
-
-    f_onair = load_font(30, bold=True)
-    txt_c = WHITE if is_live else (180, 120, 125)
-    draw.text((center_x, center_y), "🔴 ON AIR", fill=txt_c, font=f_onair, anchor="mm")
-
-def draw_peak_program_meter(draw, center_x, center_y, width, height, sub_idx, is_speaking):
-    num_bars = 24
-    bar_w = 9
-    gap = (width - (num_bars * bar_w)) // (num_bars - 1)
-
-    draw.rounded_rectangle([(center_x - width//2 - 18, center_y - height//2 - 12),
-                            (center_x + width//2 + 18, center_y + height//2 + 12)],
-                           radius=16, fill=(12, 18, 36), outline=EXECUTIVE_GOLD, width=2)
-
-    f_hud = load_font(18, bold=True)
-    draw.text((center_x, center_y - height//2 - 1), "• STUDIO BROADCAST PEAK PROGRAM METER (dB) •", fill=PLATINUM, font=f_hud, anchor="mm")
-
-    start_x = center_x - width//2
-    for b in range(num_bars):
-        if is_speaking:
-            phase = sub_idx * 0.92 + b * 0.45
-            wave = abs(math.sin(phase)) * 0.75 + abs(math.cos(phase * 1.35)) * 0.25
-            bar_h = int(12 + wave * (height - 28))
-        else:
-            bar_h = 8
-
-        bx = start_x + b * (bar_w + gap)
-        by = center_y + height//2 - 8 - bar_h
-
-        # Multi-color PPM ladder: Green below 60%, Yellow 60-85%, Red peak > 85%
-        ratio = bar_h / float(height - 28)
-        if ratio > 0.85:
-            fill_c = ON_AIR_RED
-        elif ratio > 0.55:
-            fill_c = EXECUTIVE_GOLD
-        else:
-            fill_c = (34, 197, 94) # Broadcast Green
-
-        draw.rounded_rectangle([(bx, by), (bx + bar_w, center_y + height//2 - 8)], radius=3, fill=fill_c)
-
-def render_podcast_subframe(topic_item, turn, turn_idx, sub_idx, total_subframes, elapsed, total_dur, out_path):
-    canvas = Image.new("RGBA", (VIDEO_WIDTH, VIDEO_HEIGHT), DARK_BG)
+def render_podcast_frame(base_canvas, turn, s_idx, total_subframes, elapsed, total_dur, out_path):
+    canvas = base_canvas.copy()
     draw = ImageDraw.Draw(canvas)
 
-    # Executive Penthouse Studio Backdrop
-    for y in range(VIDEO_HEIGHT):
-        ratio = y / VIDEO_HEIGHT
-        r = int(10 + ratio * 14)
-        g = int(16 + ratio * 18)
-        b = int(32 + ratio * 28)
-        draw.line([(0, y), (VIDEO_WIDTH, y)], fill=(r, g, b, 255))
+    # 1. Clean Top Left Pill (NO clutter)
+    font_tab = load_font(30, bold=True)
+    draw.rounded_rectangle([(60, 40), (560, 105)], radius=18, fill=DARK_BAR, outline=EXECUTIVE_GOLD, width=3)
+    # Wave icon
+    for b in range(6):
+        bh = int(12 + 10 * abs(math.sin(s_idx * 0.5 + b * 1.2)))
+        bx = 90 + b * 12
+        draw.line([(bx, 72 - bh//2), (bx, 72 + bh//2)], fill=EXECUTIVE_GOLD, width=3)
+    draw.text((180, 72), CHANNEL_NAME, fill=WHITE, font=font_tab, anchor="lm")
 
-    # City skyscraper bokeh / window grid in background
-    for wx in range(160, VIDEO_WIDTH, 200):
-        draw.line([(wx, 120), (wx, 620)], fill=(22, 32, 54), width=1)
-    for wy in range(160, 620, 90):
-        draw.line([(100, wy), (1820, wy)], fill=(22, 32, 54), width=1)
+    # 2. Clean Top Right Speaker Pill
+    speaker_name = "EMMA" if turn["speaker"] == "Host1" else "ANDREW"
+    font_spk = load_font(30, bold=True)
+    draw.rounded_rectangle([(1520, 40), (1880, 105)], radius=18, fill=DARK_BAR, outline=EXECUTIVE_GOLD, width=3)
+    # Vector microphone icon
+    draw.rounded_rectangle([(1555, 62), (1567, 78)], radius=4, fill=EXECUTIVE_GOLD)
+    draw.arc([(1551, 70), (1571, 84)], start=0, end=180, fill=EXECUTIVE_GOLD, width=3)
+    draw.line([(1561, 84), (1561, 90)], fill=EXECUTIVE_GOLD, width=3)
+    draw.line([(1555, 90), (1567, 90)], fill=EXECUTIVE_GOLD, width=3)
+    draw.text((1585, 72), f"HOST: {speaker_name}", fill=EXECUTIVE_GOLD, font=font_spk, anchor="lm")
 
-    # Top Header Deck
-    # Left: Channel badge
-    draw.rounded_rectangle([(60, 36), (560, 106)], radius=16, fill=CARD_BG, outline=EXECUTIVE_GOLD, width=2)
-    f_brand = load_font(28, bold=True)
-    draw.text((310, 71), "💼 BUSINESS ENGLISH PRO", fill=PLATINUM, font=f_brand, anchor="mm")
-
-    # Center: Category Pill
-    draw.rounded_rectangle([(590, 36), (1450, 106)], radius=16, fill=(18, 30, 56), outline=PLATINUM, width=2)
-    f_scen = load_font(26, bold=True)
-    draw.text((1020, 71), f"🏛️ FOCUS: {topic_item['category']}", fill=EXECUTIVE_GOLD, font=f_scen, anchor="mm")
-
-    # Right: Penthouse Studio Tag
-    draw.rounded_rectangle([(1480, 36), (1860, 106)], radius=16, fill=(24, 34, 60), outline=EXECUTIVE_GOLD, width=2)
-    f_air = load_font(26, bold=True)
-    draw.text((1670, 71), "EXECUTIVE DESK", fill=PLATINUM, font=f_air, anchor="mm")
-
-    # Visual Studio Centerpiece: ON AIR Lightbox + Dual Brass Mics + Peak PPM Meter
-    is_emma = (turn["speaker"] == "Host1")
-    is_andrew = not is_emma
-
-    # Center Top: Illuminated "ON AIR" Lightbox
-    draw_on_air_box(draw, center_x=960, center_y=190, is_live=True)
-
-    # Left Mic: Emma
-    draw_executive_mic(draw, center_x=320, center_y=380, is_active=is_emma, host_label="EMMA")
-
-    # Center Equalizer: Peak Program dB Meter
-    draw_peak_program_meter(draw, center_x=960, center_y=350, width=560, height=140, sub_idx=sub_idx, is_speaking=True)
-
-    # Center Executive Formula Pill
-    draw.rounded_rectangle([(600, 460), (1320, 540)], radius=14, fill=CARD_BG, outline=CARD_BORDER, width=2)
-    f_top = load_font(22, bold=True)
-    draw.text((960, 500), f"Executive Formula: \"{topic_item['phrase']}\"", fill=EXECUTIVE_GOLD, font=f_top, anchor="mm")
-
-    # Right Mic: Andrew
-    draw_executive_mic(draw, center_x=1600, center_y=380, is_active=is_andrew, host_label="ANDREW")
-
-    # LOWER THIRD: SLEEK SINGLE-LINE SUBTITLE DISPLAY WITH WORD-BY-WORD HIGHLIGHTING
-    draw.rounded_rectangle([(100, 680), (1820, 930)], radius=24, fill=(14, 22, 44, 240), outline=EXECUTIVE_GOLD, width=3)
-
-    # Speaker Tag Pill
-    active_name = "EMMA (Host)" if is_emma else "ANDREW (Host)"
-    draw.rounded_rectangle([(140, 650), (450, 705)], radius=12, fill=EXECUTIVE_GOLD)
-    f_spk = load_font(26, bold=True)
-    draw.text((295, 677), f"🎙️ {active_name}", fill=(10, 16, 28), font=f_spk, anchor="mm")
-
-    # Sentence & Spoken Word Highlighting
+    # 3. Huge Subtitle Typography in Safe Zone (x: 800 to 1800)
     raw_text = turn["text"]
-    words_clean = [re.sub(r'[\*\*\.]', '', w).strip() for w in raw_text.split() if w.strip()]
-    if not words_clean:
-        words_clean = ["Listen", "carefully"]
+    words_raw = raw_text.split()
+    clean_words = [re.sub(r'[\*\*\.]', '', w).strip() for w in words_raw if w.strip()]
+    if not clean_words: clean_words = ["Speak", "professionally"]
 
-    active_word_idx = min(len(words_clean) - 1, int((sub_idx / max(1, total_subframes)) * len(words_clean)))
+    active_idx = min(len(clean_words) - 1, int((s_idx / max(1, total_subframes)) * len(clean_words)))
 
-    f_sub = load_font(42, bold=True)
-    rendered_words = raw_text.split()
-
-    line_words = []
+    font_main = load_font(78, bold=True)
+    max_w = 980
     lines = []
-    max_w = 1600
+    curr_line = []
     curr_w = 0
 
-    for w_i, w in enumerate(rendered_words):
-        clean_w = re.sub(r'\*\*(.*?)\*\*', r'\1', w)
-        wb = draw.textbbox((0, 0), clean_w + " ", font=f_sub)
-        w_len = wb[2] - wb[0]
-        if curr_w + w_len > max_w and line_words:
-            lines.append(line_words)
-            line_words = [(w_i, w, clean_w, w_len)]
-            curr_w = w_len
+    for w_i, raw_w in enumerate(words_raw):
+        clean_w = re.sub(r'\*\*(.*?)\*\*', r'\1', raw_w)
+        wb = draw.textbbox((0, 0), clean_w + " ", font=font_main)
+        wl = wb[2] - wb[0]
+        if curr_w + wl > max_w and curr_line:
+            lines.append(curr_line)
+            curr_line = [(w_i, clean_w, wl)]
+            curr_w = wl
         else:
-            line_words.append((w_i, w, clean_w, w_len))
-            curr_w += w_len
-    if line_words:
-        lines.append(line_words)
+            curr_line.append((w_i, clean_w, wl))
+            curr_w += wl
+    if curr_line:
+        lines.append(curr_line)
 
-    y_start = 740 if len(lines) == 1 else 725
-    line_h = 55
-    for l_idx, line in enumerate(lines[:2]):
-        total_line_w = sum(item[3] for item in line)
-        start_x = 960 - total_line_w // 2
-        curr_x = start_x
-        y_pos = y_start + l_idx * line_h
+    line_h = 108
+    total_h = len(lines) * line_h
+    start_y = 500 - total_h // 2
+    text_center_x = 1320
 
-        for (w_i, raw_w, clean_w, w_len) in line:
-            is_active_word = (w_i == active_word_idx)
-            is_key_word = ("**" in raw_w)
+    # Gaussian blur drop shadow
+    shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    sdraw = ImageDraw.Draw(shadow)
+    for l_idx, line in enumerate(lines):
+        lw = sum(item[2] for item in line)
+        lx = text_center_x - lw // 2
+        ly = start_y + l_idx * line_h
+        for (w_i, clean_w, wl) in line:
+            sdraw.text((lx + 4, ly + 4), clean_w, fill=(0, 0, 0, 240), font=font_main)
+            lx += wl
+    shadow = shadow.filter(ImageFilter.GaussianBlur(5))
+    canvas.paste(shadow, (0, 0), shadow)
 
-            if is_active_word:
-                # Gold active karaoke pill
-                draw.rounded_rectangle([(curr_x - 4, y_pos - 6), (curr_x + w_len - 2, y_pos + 46)], radius=8, fill=EXECUTIVE_GOLD)
-                draw.text((curr_x, y_pos), clean_w, fill=(10, 16, 28), font=f_sub)
-            elif is_key_word:
-                draw.text((curr_x, y_pos), clean_w, fill=PLATINUM, font=f_sub)
-            else:
-                draw.text((curr_x, y_pos), clean_w, fill=WHITE, font=f_sub)
-            curr_x += w_len
+    # Foreground text with active spoken word highlighted in Executive Gold
+    draw = ImageDraw.Draw(canvas)
+    for l_idx, line in enumerate(lines):
+        lw = sum(item[2] for item in line)
+        lx = text_center_x - lw // 2
+        ly = start_y + l_idx * line_h
+        for (w_i, clean_w, wl) in line:
+            is_active = (w_i == active_idx)
+            col = EXECUTIVE_GOLD if is_active else WHITE
+            draw.text((lx, ly), clean_w, fill=col, font=font_main)
+            lx += wl
 
-    # Tip Ribbon inside the Lower Third
-    f_tip = load_font(22, bold=False)
-    draw.text((960, 885), "💡 Corporate Formula: Using polite modals ('could', 'would') creates instant executive diplomacy.", fill=MUTED_TEXT, font=f_tip, anchor="mm")
+    # 4. Realistic Sound Equalizer Plate at the Bottom Right
+    draw.rounded_rectangle([(840, 885), (1800, 965)], radius=14, fill=EQ_BG, outline=EQ_BORDER, width=2)
+    f_eq_lbl = load_font(18, bold=True)
+    draw.text((865, 925), "AUDIO SPECTRUM", fill=(195, 205, 235), font=f_eq_lbl, anchor="lm")
 
-    # Bottom Progress Deck
-    draw.line([(0, 1020), (VIDEO_WIDTH, 1020)], fill=(32, 45, 75), width=3)
+    # 5. Bottom Timeline & Progress Bar
+    draw.line([(0, 1025), (VIDEO_WIDTH, 1025)], fill=(35, 45, 75), width=2)
     ratio = min(1.0, elapsed / max(1.0, total_dur))
-    draw.line([(0, 1020), (int(VIDEO_WIDTH * ratio), 1020)], fill=EXECUTIVE_GOLD, width=6)
+    draw.line([(0, 1025), (int(VIDEO_WIDTH * ratio), 1025)], fill=EXECUTIVE_GOLD, width=5)
 
-    f_bot = load_font(24, bold=False)
-    draw.text((70, 1050), "Business English Pro • Executive Communication • Corporate Fluency", fill=MUTED_TEXT, font=f_bot, anchor="lm")
+    f_bot = load_font(26, bold=False)
+    draw.text((70, 1052), "Executive English Dialogue • Workplace Leadership Communication", fill=MUTED_WHITE, font=f_bot, anchor="lm")
     time_str = f"{int(elapsed // 60):02d}:{int(elapsed % 60):02d} / {int(total_dur // 60):02d}:{int(total_dur % 60):02d}"
-    draw.text((1850, 1050), time_str, fill=EXECUTIVE_GOLD, font=f_bot, anchor="rm")
+    draw.text((1850, 1052), time_str, fill=EXECUTIVE_GOLD, font=f_bot, anchor="rm")
 
-    canvas.convert("RGB").save(out_path, quality=90)
+    canvas.convert("RGB").save(out_path, quality=92)
 
 def assemble_video(topic_item, turns, audio_list, run_dir):
     frames_dir = run_dir / "frames"
@@ -366,39 +301,48 @@ def assemble_video(topic_item, turns, audio_list, run_dir):
     frames_dir.mkdir(parents=True, exist_ok=True)
     clips_dir.mkdir(parents=True, exist_ok=True)
 
+    base_canvas = load_base_studio_canvas()
     total_dur = sum(a["duration"] for a in audio_list)
     elapsed = 0.0
     clips = []
 
     for i, (turn, audio) in enumerate(zip(turns, audio_list)):
         dur = audio["duration"]
-        subframes_count = max(8, int(dur * SUBFRAMES_PER_SEC))
+        words_count = len(turn["text"].split())
+        subframes_count = max(words_count, int(dur * 2))
+        fps_sub = subframes_count / dur
 
         turn_frames_dir = frames_dir / f"turn_{i:03d}"
         turn_frames_dir.mkdir(parents=True, exist_ok=True)
 
-        for s_idx in range(subframes_count):
-            frame_p = turn_frames_dir / f"frame_{s_idx:04d}.png"
-            sub_elapsed = elapsed + (s_idx / subframes_count) * dur
-            render_podcast_subframe(
-                topic_item, turn, i, s_idx, subframes_count,
-                sub_elapsed, total_dur, str(frame_p)
-            )
+        for s in range(subframes_count):
+            frame_p = turn_frames_dir / f"frame_{s:04d}.png"
+            sub_elapsed = elapsed + (s / subframes_count) * dur
+            render_podcast_frame(base_canvas, turn, s, subframes_count, sub_elapsed, total_dur, str(frame_p))
 
         clip_p = clips_dir / f"clip_{i:03d}.mp4"
         input_pattern = str(turn_frames_dir / "frame_%04d.png")
 
+        # Realistic sound equalizer directly reactive to actual voice audio frequencies
+        filter_str = (
+            f"[1:a]showfreqs=s=740x55:mode=bar:ascale=log:fscale=log:colors={EQ_COLORS_FFMPEG}:win_size=1024[eq];"
+            f"[0:v][eq]overlay=x=1030:y=895:shortest=1[v]"
+        )
+
         cmd = [
             "ffmpeg", "-y",
-            "-framerate", str(SUBFRAMES_PER_SEC),
+            "-framerate", str(fps_sub),
             "-i", input_pattern,
             "-i", audio["path"],
+            "-filter_complex", filter_str,
+            "-map", "[v]",
+            "-map", "1:a",
             "-c:v", "libx264",
             "-pix_fmt", "yuv420p",
             "-c:a", "aac",
             "-b:a", "192k",
             "-shortest",
-            "-preset", "veryfast",
+            "-preset", "ultrafast",
             str(clip_p)
         ]
         subprocess.run(cmd, check=True, capture_output=True)
@@ -412,7 +356,15 @@ def assemble_video(topic_item, turns, audio_list, run_dir):
             f.write(f"file '{c.resolve().as_posix()}'\n")
 
     final_video = run_dir / "business_english_podcast_final.mp4"
-    subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_txt), "-c", "copy", str(final_video)], check=True, capture_output=True)
+    subprocess.run([
+        "ffmpeg", "-y",
+        "-f", "concat",
+        "-safe", "0",
+        "-i", str(concat_txt),
+        "-c", "copy",
+        str(final_video)
+    ], check=True, capture_output=True)
+
     return final_video, total_dur
 
 async def run_business_generation(topic_idx=0, turns_count=4):
@@ -421,14 +373,16 @@ async def run_business_generation(topic_idx=0, turns_count=4):
     run_dir = OUTPUT_DIR / f"run_{ts}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"[Business Podcast] Generating 16:9 Executive Penthouse: '{topic_item['topic']}' ({turns_count} turns)...")
+    print(f"[Business Podcast] Generating 16:9 Broadcast: '{topic_item['topic']}' ({turns_count} turns)...")
     turns = generate_script_ai(topic_item, target_turns=turns_count)
     audio_list = await generate_audio_files(turns, run_dir)
     video_p, dur = assemble_video(topic_item, turns, audio_list, run_dir)
 
     meta = {
         "title": f"Business English Pro: {topic_item['topic']} 🎙️ Slow English Podcast",
-        "description": f"Level up your corporate English! Master executive communication: '{topic_item['phrase']}'. Follow for daily workplace English lessons! 💼📊",
+        "description": f"Master executive English! Learn key workplace formulas: '{topic_item['phrase']}'. Follow for daily corporate English lessons! 💼📊",
+        "topic": topic_item["topic"],
+        "category": topic_item["category"],
         "phrase": topic_item["phrase"],
         "duration_seconds": dur
     }
@@ -439,4 +393,4 @@ async def run_business_generation(topic_idx=0, turns_count=4):
     return video_p, meta
 
 if __name__ == "__main__":
-    asyncio.run(run_business_generation(topic_idx=0, turns_count=2))
+    asyncio.run(run_business_generation(topic_idx=0, turns_count=4))
