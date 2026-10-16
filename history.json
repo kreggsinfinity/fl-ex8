@@ -7,5 +7,14 @@
     "duration_min": 23.13,
     "video_file": "podcast_ep1_20261016_032704.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 2,
+    "topic": "The Art of the Ask: Strategic Requests for Resources and Support",
+    "date": "2026-10-16T06:23:46.691341",
+    "duration_sec": 1320.69,
+    "duration_min": 22.01,
+    "video_file": "podcast_ep2_20261016_060508.mp4",
+    "platform": "Facebook"
   }
 ]
