@@ -17,6 +17,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.01,
     "video_file": "podcast_ep2_20261016_060508.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 3,
+    "topic": "Bridging the Divide: Persuasive Language for Cross-Departmental Collaboration",
+    "date": "2026-10-17T06:08:56.875271",
+    "duration_sec": 1192.89,
+    "duration_min": 19.88,
+    "video_file": "podcast_ep3_20261017_055119.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
