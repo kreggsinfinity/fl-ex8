@@ -26,6 +26,15 @@ const PODCAST_HISTORY = [
     "duration_min": 19.88,
     "video_file": "podcast_ep3_20261017_055119.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 4,
+    "topic": "The Power of Pause: Strategic Silence in Executive Negotiations",
+    "date": "2026-10-18T06:28:49.303188",
+    "duration_sec": 1284.44,
+    "duration_min": 21.41,
+    "video_file": "podcast_ep4_20261018_061715.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
