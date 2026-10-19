@@ -35,6 +35,15 @@ const PODCAST_HISTORY = [
     "duration_min": 21.41,
     "video_file": "podcast_ep4_20261018_061715.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 5,
+    "topic": "The Art of the Pivot: Gracefully Shifting Strategy in Crisis",
+    "date": "2026-10-19T06:49:05.386770",
+    "duration_sec": 1344.89,
+    "duration_min": 22.41,
+    "video_file": "podcast_ep5_20261019_062929.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
