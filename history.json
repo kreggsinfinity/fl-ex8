@@ -43,5 +43,14 @@
     "duration_min": 22.41,
     "video_file": "podcast_ep5_20261019_062929.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 6,
+    "topic": "Decoding the Unspoken: Mastering Subtext in Executive Communications",
+    "date": "2026-10-20T06:36:22.610641",
+    "duration_sec": 1292.4,
+    "duration_min": 21.54,
+    "video_file": "podcast_ep6_20261020_061715.mp4",
+    "platform": "Facebook"
   }
 ]
