@@ -53,6 +53,15 @@ const PODCAST_HISTORY = [
     "duration_min": 21.54,
     "video_file": "podcast_ep6_20261020_061715.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 7,
+    "topic": "The Art of the Advocate: Championing Your Ideas in Executive Meetings",
+    "date": "2026-10-21T06:35:09.574145",
+    "duration_sec": 1298.26,
+    "duration_min": 21.64,
+    "video_file": "podcast_ep7_20261021_061715.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
