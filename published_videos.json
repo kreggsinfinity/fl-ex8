@@ -61,5 +61,14 @@
     "duration_min": 21.64,
     "video_file": "podcast_ep7_20261021_061715.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 8,
+    "topic": "The Diplomat's Gambit: Navigating Uncomfortable Truths with Tact and Authority",
+    "date": "2026-10-22T06:31:55.595945",
+    "duration_sec": 1260.69,
+    "duration_min": 21.01,
+    "video_file": "podcast_ep8_20261022_062014.mp4",
+    "platform": "Facebook"
   }
 ]
