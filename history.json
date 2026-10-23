@@ -70,5 +70,14 @@
     "duration_min": 21.01,
     "video_file": "podcast_ep8_20261022_062014.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 9,
+    "topic": "The Architect of Agreement: Building Consensus in Contentious Boardroom Battles",
+    "date": "2026-10-23T06:29:01.437934",
+    "duration_sec": 1210.03,
+    "duration_min": 20.17,
+    "video_file": "podcast_ep9_20261023_061414.mp4",
+    "platform": "Facebook"
   }
 ]
