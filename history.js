@@ -80,6 +80,15 @@ const PODCAST_HISTORY = [
     "duration_min": 20.17,
     "video_file": "podcast_ep9_20261023_061414.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 10,
+    "topic": "The Executive's Edge: Mastering the Art of Strategic Feedback",
+    "date": "2026-10-24T06:36:52.010012",
+    "duration_sec": 1360.46,
+    "duration_min": 22.67,
+    "video_file": "podcast_ep10_20261024_060922.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
