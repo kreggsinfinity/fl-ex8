@@ -89,6 +89,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.67,
     "video_file": "podcast_ep10_20261024_060922.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 11,
+    "topic": "The Counter-Offer Catalyst: Steering Negotiations Towards Mutual Gain",
+    "date": "2026-10-25T06:54:36.995553",
+    "duration_sec": 1374.45,
+    "duration_min": 22.91,
+    "video_file": "podcast_ep11_20261025_062948.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
