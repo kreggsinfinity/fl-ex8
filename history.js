@@ -98,6 +98,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.91,
     "video_file": "podcast_ep11_20261025_062948.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 12,
+    "topic": "The Strategic Reframe: Turning Objections into Opportunities",
+    "date": "2026-10-26T07:33:15.376919",
+    "duration_sec": 1175.69,
+    "duration_min": 19.59,
+    "video_file": "podcast_ep12_20261026_070429.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
