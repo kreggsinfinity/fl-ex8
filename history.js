@@ -116,6 +116,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.99,
     "video_file": "podcast_ep13_20261027_063409.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 14,
+    "topic": "The Pre-Emptive Strike: Mastering Proactive Communication to Disarm Conflict",
+    "date": "2026-10-28T07:35:18.385808",
+    "duration_sec": 1355.23,
+    "duration_min": 22.59,
+    "video_file": "podcast_ep14_20261028_070456.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
