@@ -125,6 +125,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.59,
     "video_file": "podcast_ep14_20261028_070456.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 15,
+    "topic": "The Art of the Soft Landing: Delivering Difficult News with Executive Grace",
+    "date": "2026-10-29T07:43:31.738408",
+    "duration_sec": 1276.7,
+    "duration_min": 21.28,
+    "video_file": "podcast_ep15_20261029_072614.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
