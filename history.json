@@ -142,5 +142,14 @@
     "duration_min": 21.69,
     "video_file": "podcast_ep16_20261030_072930.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 17,
+    "topic": "The Art of the Concession: Strategic Give-and-Take in Executive Negotiations",
+    "date": "2026-10-31T07:34:42.700283",
+    "duration_sec": 1259.13,
+    "duration_min": 20.99,
+    "video_file": "podcast_ep17_20261031_071603.mp4",
+    "platform": "Facebook"
   }
 ]
