@@ -151,5 +151,14 @@
     "duration_min": 20.99,
     "video_file": "podcast_ep17_20261031_071603.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 18,
+    "topic": "The Executive's Echo Chamber: Breaking Through Silos with Strategic Inquiry",
+    "date": "2026-11-01T08:08:03.743730",
+    "duration_sec": 1323.79,
+    "duration_min": 22.06,
+    "video_file": "podcast_ep18_20261101_074829.mp4",
+    "platform": "Facebook"
   }
 ]
