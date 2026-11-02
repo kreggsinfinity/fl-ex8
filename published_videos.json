@@ -160,5 +160,14 @@
     "duration_min": 22.06,
     "video_file": "podcast_ep18_20261101_074829.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 19,
+    "topic": "The Architect of Influence: Crafting Compelling Arguments for Executive Buy-In",
+    "date": "2026-11-02T08:13:20.035701",
+    "duration_sec": 1231.65,
+    "duration_min": 20.53,
+    "video_file": "podcast_ep19_20261102_075453.mp4",
+    "platform": "Facebook"
   }
 ]
