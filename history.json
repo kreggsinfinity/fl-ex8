@@ -169,5 +169,14 @@
     "duration_min": 20.53,
     "video_file": "podcast_ep19_20261102_075453.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 20,
+    "topic": "The Art of the Strategic Apology: Repairing Relationships and Rebuilding Trust",
+    "date": "2026-11-03T08:36:51.289180",
+    "duration_sec": 1354.85,
+    "duration_min": 22.58,
+    "video_file": "podcast_ep20_20261103_081514.mp4",
+    "platform": "Facebook"
   }
 ]
