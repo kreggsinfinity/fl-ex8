@@ -179,6 +179,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.58,
     "video_file": "podcast_ep20_20261103_081514.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 21,
+    "topic": "The Strategic Sidetrack: Steering Conversations Without Derailing Goals",
+    "date": "2026-11-04T08:05:12.757680",
+    "duration_sec": 1292.28,
+    "duration_min": 21.54,
+    "video_file": "podcast_ep21_20261104_074624.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
