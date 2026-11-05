@@ -188,6 +188,15 @@ const PODCAST_HISTORY = [
     "duration_min": 21.54,
     "video_file": "podcast_ep21_20261104_074624.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 22,
+    "topic": "The Art of the Agile Pivot: Mastering Adaptability in Dynamic Business Scenarios",
+    "date": "2026-11-05T08:29:46.641584",
+    "duration_sec": 1392.17,
+    "duration_min": 23.2,
+    "video_file": "podcast_ep22_20261105_080852.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
