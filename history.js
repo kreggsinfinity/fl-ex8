@@ -197,6 +197,15 @@ const PODCAST_HISTORY = [
     "duration_min": 23.2,
     "video_file": "podcast_ep22_20261105_080852.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 23,
+    "topic": "The Executive's Blueprint: Crafting Persuasive Proposals That Seal the Deal",
+    "date": "2026-11-06T08:26:56.341422",
+    "duration_sec": 1263.98,
+    "duration_min": 21.07,
+    "video_file": "podcast_ep23_20261106_081320.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
