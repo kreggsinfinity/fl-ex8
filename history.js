@@ -206,6 +206,15 @@ const PODCAST_HISTORY = [
     "duration_min": 21.07,
     "video_file": "podcast_ep23_20261106_081320.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 24,
+    "topic": "The Diplomat's Dance: Navigating Stakeholder Agendas with Grace and Precision",
+    "date": "2026-11-07T07:49:11.767187",
+    "duration_sec": 1235.97,
+    "duration_min": 20.6,
+    "video_file": "podcast_ep24_20261107_073007.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
