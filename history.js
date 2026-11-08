@@ -215,6 +215,15 @@ const PODCAST_HISTORY = [
     "duration_min": 20.6,
     "video_file": "podcast_ep24_20261107_073007.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 25,
+    "topic": "The Art of the Echo: Amplifying Your Message for Maximum Executive Impact",
+    "date": "2026-11-08T07:56:37.714024",
+    "duration_sec": 1326.12,
+    "duration_min": 22.1,
+    "video_file": "podcast_ep25_20261108_074115.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
