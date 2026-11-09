@@ -224,6 +224,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.1,
     "video_file": "podcast_ep25_20261108_074115.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 26,
+    "topic": "The Executive's Compass: Navigating Ambiguity with Confidence and Clarity",
+    "date": "2026-11-09T08:37:44.091350",
+    "duration_sec": 1342.1,
+    "duration_min": 22.37,
+    "video_file": "podcast_ep26_20261109_082120.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
