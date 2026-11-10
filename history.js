@@ -233,6 +233,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.37,
     "video_file": "podcast_ep26_20261109_082120.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 27,
+    "topic": "The Art of the Anchoring Statement: Setting the Tone for Peak Negotiations",
+    "date": "2026-11-10T09:03:02.728446",
+    "duration_sec": 1366.51,
+    "duration_min": 22.78,
+    "video_file": "podcast_ep27_20261110_084224.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
