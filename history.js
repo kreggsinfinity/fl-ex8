@@ -251,6 +251,15 @@ const PODCAST_HISTORY = [
     "duration_min": 20.03,
     "video_file": "podcast_ep28_20261111_075851.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 29,
+    "topic": "The Executive's Gambit: Mastering Strategic Silence to Control the Narrative",
+    "date": "2026-11-12T08:54:52.416524",
+    "duration_sec": 1365.0,
+    "duration_min": 22.75,
+    "video_file": "podcast_ep29_20261112_083803.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
