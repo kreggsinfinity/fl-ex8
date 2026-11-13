@@ -259,5 +259,14 @@
     "duration_min": 22.75,
     "video_file": "podcast_ep29_20261112_083803.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 30,
+    "topic": "The Executive's Leverage Play: Mastering the Art of Strategic Anchoring in Negotiations",
+    "date": "2026-11-13T08:41:31.096966",
+    "duration_sec": 1221.19,
+    "duration_min": 20.35,
+    "video_file": "podcast_ep30_20261113_082549.mp4",
+    "platform": "Facebook"
   }
 ]
