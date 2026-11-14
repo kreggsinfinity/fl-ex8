@@ -269,6 +269,15 @@ const PODCAST_HISTORY = [
     "duration_min": 20.35,
     "video_file": "podcast_ep30_20261113_082549.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 31,
+    "topic": "The Executive's Empathy Engine: Decoding Emotional Intelligence for Unshakeable Influence",
+    "date": "2026-11-14T08:02:53.047243",
+    "duration_sec": 1373.45,
+    "duration_min": 22.89,
+    "video_file": "podcast_ep31_20261114_074812.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
