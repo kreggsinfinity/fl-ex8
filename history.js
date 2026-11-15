@@ -278,6 +278,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.89,
     "video_file": "podcast_ep31_20261114_074812.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 32,
+    "topic": "The Executive's Leverage Playbook: Mastering Strategic Framing for Unassailable Influence",
+    "date": "2026-11-15T08:26:01.332870",
+    "duration_sec": 1344.29,
+    "duration_min": 22.4,
+    "video_file": "podcast_ep32_20261115_080635.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
