@@ -287,6 +287,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.4,
     "video_file": "podcast_ep32_20261115_080635.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 33,
+    "topic": "The Art of the 'No': Delivering Firm Yet Diplomatic Rejections",
+    "date": "2026-11-16T08:30:35.347446",
+    "duration_sec": 1360.27,
+    "duration_min": 22.67,
+    "video_file": "podcast_ep33_20261116_081532.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
