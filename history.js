@@ -296,6 +296,15 @@ const PODCAST_HISTORY = [
     "duration_min": 22.67,
     "video_file": "podcast_ep33_20261116_081532.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 34,
+    "topic": "The Executive Accord: Crafting Collaborative Solutions in Cross-Functional Conflict",
+    "date": "2026-11-17T09:50:34.841218",
+    "duration_sec": 1280.97,
+    "duration_min": 21.35,
+    "video_file": "podcast_ep34_20261117_093035.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
