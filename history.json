@@ -304,5 +304,14 @@
     "duration_min": 21.35,
     "video_file": "podcast_ep34_20261117_093035.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 35,
+    "topic": "The Executive Navigator: Steering Through Ambiguous Instructions with Precision",
+    "date": "2026-11-18T09:08:39.083298",
+    "duration_sec": 1274.13,
+    "duration_min": 21.24,
+    "video_file": "podcast_ep35_20261118_084929.mp4",
+    "platform": "Facebook"
   }
 ]
