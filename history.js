@@ -314,6 +314,15 @@ const PODCAST_HISTORY = [
     "duration_min": 21.24,
     "video_file": "podcast_ep35_20261118_084929.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 36,
+    "topic": "The Executive's 'Why Not?': Unlocking Innovation by Challenging Assumptions",
+    "date": "2026-11-19T09:16:37.270781",
+    "duration_sec": 1294.2,
+    "duration_min": 21.57,
+    "video_file": "podcast_ep36_20261119_090358.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
