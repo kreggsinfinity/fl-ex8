@@ -323,6 +323,15 @@ const PODCAST_HISTORY = [
     "duration_min": 21.57,
     "video_file": "podcast_ep36_20261119_090358.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 37,
+    "topic": "The Executive's 'Bridge Builder': Forging Alliances Across Divided Teams",
+    "date": "2026-11-20T09:08:54.538393",
+    "duration_sec": 1275.34,
+    "duration_min": 21.26,
+    "video_file": "podcast_ep37_20261120_085045.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
