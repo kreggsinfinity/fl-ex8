@@ -331,5 +331,14 @@
     "duration_min": 21.26,
     "video_file": "podcast_ep37_20261120_085045.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 38,
+    "topic": "The Executive's 'What If': Mastering Hypotheticals for Strategic Advantage",
+    "date": "2026-11-21T08:49:55.961042",
+    "duration_sec": 1290.31,
+    "duration_min": 21.51,
+    "video_file": "podcast_ep38_20261121_083158.mp4",
+    "platform": "Facebook"
   }
 ]
