@@ -349,5 +349,14 @@
     "duration_min": 22.89,
     "video_file": "podcast_ep39_20261122_082610.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 40,
+    "topic": "The Executive's 'Yes, And...' Gambit: Building Consensus Through Collaborative Affirmation",
+    "date": "2026-11-23T09:45:40.869969",
+    "duration_sec": 1342.44,
+    "duration_min": 22.37,
+    "video_file": "podcast_ep40_20261123_092525.mp4",
+    "platform": "Facebook"
   }
 ]
