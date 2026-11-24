@@ -358,5 +358,14 @@
     "duration_min": 22.37,
     "video_file": "podcast_ep40_20261123_092525.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 41,
+    "topic": "The Executive's 'Unlocking Agreement': Mastering the Art of Finding Common Ground in Stalled Negotiations",
+    "date": "2026-11-24T11:35:49.947093",
+    "duration_sec": 1275.98,
+    "duration_min": 21.27,
+    "video_file": "podcast_ep41_20261124_112121.mp4",
+    "platform": "Facebook"
   }
 ]
