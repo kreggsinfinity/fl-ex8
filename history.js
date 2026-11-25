@@ -368,6 +368,15 @@ const PODCAST_HISTORY = [
     "duration_min": 21.27,
     "video_file": "podcast_ep41_20261124_112121.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 42,
+    "topic": "The Executive's 'Pre-Mortem': Anticipating Risks Before They Materialize",
+    "date": "2026-11-25T10:23:10.502625",
+    "duration_sec": 1209.65,
+    "duration_min": 20.16,
+    "video_file": "podcast_ep42_20261125_100611.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
