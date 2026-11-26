@@ -376,5 +376,14 @@
     "duration_min": 20.16,
     "video_file": "podcast_ep42_20261125_100611.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 43,
+    "topic": "The Executive's Pivot Point: Navigating Unexpected Objections with Agile Diplomacy",
+    "date": "2026-11-26T10:07:02.265271",
+    "duration_sec": 1259.81,
+    "duration_min": 21.0,
+    "video_file": "podcast_ep43_20261126_095139.mp4",
+    "platform": "Facebook"
   }
 ]
