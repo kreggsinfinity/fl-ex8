@@ -386,6 +386,15 @@ const PODCAST_HISTORY = [
     "duration_min": 21.0,
     "video_file": "podcast_ep43_20261126_095139.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 44,
+    "topic": "The Executive Symphony: Orchestrating Complex Team Dynamics for Peak Performance",
+    "date": "2026-11-27T10:05:52.623913",
+    "duration_sec": 1295.35,
+    "duration_min": 21.59,
+    "video_file": "podcast_ep44_20261127_095343.mp4",
+    "platform": "Facebook"
   }
 ];
 if (typeof module !== 'undefined' && module.exports) { module.exports = PODCAST_HISTORY; }
