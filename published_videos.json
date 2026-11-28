@@ -394,5 +394,14 @@
     "duration_min": 21.59,
     "video_file": "podcast_ep44_20261127_095343.mp4",
     "platform": "Facebook"
+  },
+  {
+    "episode": 45,
+    "topic": "The Executive's 'Pre-Approved' Permission: Navigating Unstated Authority and Implicit Trust",
+    "date": "2026-11-28T09:24:07.715630",
+    "duration_sec": 1243.37,
+    "duration_min": 20.72,
+    "video_file": "podcast_ep45_20261128_090717.mp4",
+    "platform": "None"
   }
 ]
